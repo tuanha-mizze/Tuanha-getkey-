@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GetKey Mizze</title>
+<style>
+:root{--bg:#0a0a14;--card:rgba(255,255,255,.06);--border:rgba(255,255,255,.13);--text:#eef0ff;--muted:#a3a7c4;--a1:#8b5cf6;--a2:#22d3ee;--ok:#4ade80;--err:#f87171}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,#1b1740 0%,var(--bg) 60%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px 20px 40px;overflow-x:hidden}
+.wrap{max-width:520px;margin:0 auto;position:relative;z-index:1}
+
+/* nền động */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 14s ease-in-out infinite alternate}
+.o1{width:260px;height:260px;background:var(--a1);top:-60px;left:-60px}
+.o2{width:300px;height:300px;background:var(--a2);bottom:-80px;right:-80px;animation-delay:-5s}
+.o3{width:180px;height:180px;background:#f472b6;top:45%;left:60%;animation-delay:-9s}
+@keyframes float{to{transform:translate3d(40px,-50px,0) scale(1.15)}}
+.grid{position:absolute;inset:auto 0 0 0;height:55%;background-image:linear-gradient(rgba(139,92,246,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.25) 1px,transparent 1px);background-size:44px 44px;transform:perspective(500px) rotateX(62deg);transform-origin:bottom;mask-image:linear-gradient(to top,#000,transparent);-webkit-mask-image:linear-gradient(to top,#000,transparent);animation:grid 4s linear infinite}
+@keyframes grid{to{background-position:0 44px,44px 0}}
+
+/* logo khối 3D */
+.hero{text-align:center;margin:6px 0 18px}
+.scene{width:84px;height:84px;margin:14px auto 22px;perspective:520px}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 9s linear infinite}
+.face{position:absolute;width:84px;height:84px;display:grid;place-items:center;font-size:1.9rem;font-weight:800;border:1px solid rgba(255,255,255,.4);background:linear-gradient(135deg,rgba(139,92,246,.55),rgba(34,211,238,.4));box-shadow:inset 0 0 24px rgba(255,255,255,.18),0 0 24px rgba(139,92,246,.35)}
+.f1{transform:translateZ(42px)}.f2{transform:rotateY(90deg) translateZ(42px)}.f3{transform:rotateY(180deg) translateZ(42px)}
+.f4{transform:rotateY(-90deg) translateZ(42px)}.f5{transform:rotateX(90deg) translateZ(42px)}.f6{transform:rotateX(-90deg) translateZ(42px)}
+@keyframes spin{from{transform:rotateX(-22deg) rotateY(0)}to{transform:rotateX(-22deg) rotateY(360deg)}}
+.brand{font-size:1.9rem;font-weight:800;letter-spacing:.5px;margin:0;background:linear-gradient(90deg,var(--a1),var(--a2),#f472b6,var(--a1));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:250% 0}}
+.tag{color:var(--muted);font-size:.9rem;margin:4px 0 0}
+
+/* thẻ kính + nghiêng 3D */
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.35);transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:perspective(900px) translateY(24px) rotateX(-12deg)}}
+h3{margin:0 0 12px;font-size:1.02rem}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-size:.85rem;color:var(--muted)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+
+input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:var(--text);font-size:1rem;margin-bottom:10px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--a2);box-shadow:0 0 0 3px rgba(34,211,238,.2)}
+
+button{font:inherit;border:0;cursor:pointer;color:#fff;font-weight:700;font-size:1rem;padding:13px 16px;border-radius:14px;background:linear-gradient(135deg,var(--a1),#6366f1);box-shadow:0 5px 0 #4c2fb0,0 12px 24px rgba(99,102,241,.4);transition:transform .08s,box-shadow .08s,filter .2s;position:relative}
+button:hover{filter:brightness(1.12)}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #4c2fb0,0 4px 10px rgba(99,102,241,.4)}
+button.w{width:100%}
+button.g{background:rgba(255,255,255,.08);box-shadow:0 4px 0 rgba(0,0,0,.35);border:1px solid var(--border);font-weight:600;font-size:.88rem;padding:9px 13px;color:var(--text)}
+button.g:active{box-shadow:0 0 0 rgba(0,0,0,.35)}
+button.on{background:linear-gradient(135deg,var(--a2),#3b82f6);box-shadow:0 4px 0 #0e7490}
+button:disabled{opacity:.55;pointer-events:none}
+button.big{font-size:1.2rem;padding:18px;animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 5px 0 #4c2fb0,0 12px 40px rgba(139,92,246,.8)}}
+.gap{height:10px}
+
+.key{font-family:ui-monospace,Menlo,monospace;font-size:1.35rem;font-weight:800;text-align:center;word-break:break-all;padding:18px 10px;margin:6px 0 14px;border-radius:14px;color:var(--ok);background:rgba(74,222,128,.08);border:2px dashed rgba(74,222,128,.6);text-shadow:0 0 14px rgba(74,222,128,.6);transform-origin:50% 0;animation:flip .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes flip{from{opacity:0;transform:perspective(600px) rotateX(-95deg)}}
+.msg{font-size:.88rem;text-align:center;margin-top:10px;color:var(--muted);min-height:1em}
+.err{color:var(--err)}
+a{text-decoration:none}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;perspective:700px}
+.stat{text-align:center;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:14px;padding:14px 4px;transition:transform .25s;animation:rise .6s both}
+.stat:nth-child(2){animation-delay:.1s}.stat:nth-child(3){animation-delay:.2s}
+.stat:hover{transform:translateZ(30px) rotateX(8deg)}
+.stat b{display:block;font-size:1.6rem;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{color:var(--muted);font-size:.74rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:12px}
+td,th{text-align:left;padding:7px 4px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:.8rem}
+
+.spin{width:34px;height:34px;margin:10px auto;border-radius:50%;border:3px solid var(--border);border-top-color:var(--a2);animation:r 0.8s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="scene"><div class="cube">
+      <div class="face f1">🔑</div><div class="face f2">M</div><div class="face f3">🔑</div>
+      <div class="face f4">Z</div><div class="face f5">✦</div><div class="face f6">✦</div>
+    </div></div>
+    <h1 class="brand">GetKey Mizze</h1>
+    <p class="tag">Vượt link nhanh · nhận key tức thì</p>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
+<script>
+/* ========= CẤU HÌNH (lấy ở Supabase > Project Settings > API) ========= */
+const SUPABASE_URL = "https://ifbjrotyrkypcqowkzlp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_0KfgdmIgvLMA_Q_-pTj6Iw_BXtCSQ1k";
+/* ======================================================================= */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const app = document.getElementById("app");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let user = null, isAdmin = false;
+
+// Hiệu ứng nghiêng 3D theo con trỏ
+app.addEventListener("pointermove", e => {
+  const c = e.target.closest(".card"); if (!c || e.pointerType === "touch") return;
+  const r = c.getBoundingClientRect();
+  c.style.setProperty("--ry", ((e.clientX - r.left) / r.width - .5) * 8 + "deg");
+  c.style.setProperty("--rx", (.5 - (e.clientY - r.top) / r.height) * 8 + "deg");
+});
+app.addEventListener("pointerout", e => {
+  const c = e.target.closest(".card");
+  if (c && !c.contains(e.relatedTarget)){ c.style.setProperty("--rx", "0deg"); c.style.setProperty("--ry", "0deg"); }
+});
+
+function errText(e){
+  const m = (e && e.message) || "";
+  if (m.includes("too_fast")) return "Bạn vượt link quá nhanh. Vui lòng thử lại.";
+  if (m.includes("expired")) return "Key đã hết hạn. Hãy lấy key mới.";
+  if (m.includes("invalid")) return "Phiên không hợp lệ.";
+  if (m.includes("user_not_found")) return "Không tìm thấy tài khoản với email này.";
+  if (m.includes("forbidden")) return "Bạn không có quyền admin.";
+  return m || "Có lỗi xảy ra.";
+}
+function setMsg(t, bad){ const el = $("msg"); if (el){ el.textContent = t; el.className = "msg" + (bad ? " err" : ""); } }
+
+function shell(inner, tab){
+  app.innerHTML =
+    '<div class="bar"><span>' + esc(user.email) + '</span><button class="g" id="out">Thoát</button></div>' +
+    (isAdmin ? '<div class="tabs"><button class="g' + (tab==="home"?" on":"") + '" id="t1">Người dùng</button><button class="g' + (tab==="admin"?" on":"") + '" id="t2">Admin</button></div>' : "") +
+    inner + '<div class="msg" id="msg"></div>';
+  $("out").onclick = async () => { await sb.auth.signOut(); boot(); };
+  if (isAdmin){ $("t1").onclick = homeView; $("t2").onclick = adminView; }
+}
+
+function authView(){
+  app.innerHTML =
+    '<div class="card"><h3>Đăng nhập để tiếp tục</h3>' +
+    '<input id="em" type="email" placeholder="Email" autocomplete="email">' +
+    '<input id="pw" type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" autocomplete="current-password">' +
+    '<button class="w" id="li">Đăng nhập</button><div class="gap"></div>' +
+    '<button class="w g" id="su">Đăng ký tài khoản mới</button><div class="msg" id="msg"></div></div>';
+  $("li").onclick = async () => {
+    const { error } = await sb.auth.signInWithPassword({ email: $("em").value.trim(), password: $("pw").value });
+    if (error) setMsg(error.message, true); else boot();
+  };
+  $("su").onclick = async () => {
+    const { data, error } = await sb.auth.signUp({ email: $("em").value.trim(), password: $("pw").value });
+    if (error) return setMsg(error.message, true);
+    if (data.session) boot(); else setMsg("Đã đăng ký. Hãy kiểm tra email để xác nhận rồi đăng nhập.");
+  };
+}
+
+function keyCard(k){
+  const exp = new Date(k.expires).toLocaleString("vi-VN");
+  return '<div class="card"><h3>✅ Key của bạn</h3><div class="key">' + esc(k.key) + '</div>' +
+    '<button class="w" id="cp">Sao chép key</button>' +
+    (k.dest ? '<div class="gap"></div><a href="' + esc(k.dest) + '" target="_blank" rel="noopener"><button class="w g">Mở link đích</button></a>' : "") +
+    '<div class="msg">Hết hạn: ' + esc(exp) + '</div></div>';
+}
+function bindCopy(k){
+  const b = $("cp"); if (!b) return;
+  b.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(k.key) : Promise.resolve()).finally(() => b.textContent = "Đã sao chép ✓"); };
+}
+
+async function homeView(){
+  shell('<div class="card"><div class="spin"></div></div>', "home");
+  const { data: k } = await sb.rpc("my_key");
+  if (k){ shell(keyCard(k), "home"); return bindCopy(k); }
+  shell('<div class="card"><button class="w big" id="go">🔑 Lấy key</button><div class="msg">Bạn sẽ được chuyển sang trang vượt link, xong sẽ tự quay về đây.</div></div>', "home");
+  $("go").onclick = async function(){
+    this.disabled = true;
+    const { data, error } = await sb.rpc("start_session", { p_return: location.origin + location.pathname });
+    if (error){ this.disabled = false; return setMsg(errText(error), true); }
+    location.href = data;
+  };
+}
+
+async function finish(sid){
+  shell('<div class="card"><div class="spin"></div><div class="msg">Đang xác nhận…</div></div>', "home");
+  const { data: k, error } = await sb.rpc("complete_session", { p_sid: sid });
+  if (error){ await homeView(); return setMsg(errText(error), true); }
+  shell(keyCard(k), "home"); bindCopy(k);
+}
+
+async function adminView(){
+  shell('<div class="card"><div class="spin"></div></div>', "admin");
+  const { data: s, error } = await sb.rpc("admin_stats");
+  if (error) return setMsg(errText(error), true);
+  const rate = s.clicks ? Math.round(s.completed / s.clicks * 100) : 0;
+  shell(
+    '<div class="card"><h3>📊 Thống kê</h3><div class="stats">' +
+    '<div class="stat"><b>' + s.clicks + '</b><small>Lượt nhấn</small></div>' +
+    '<div class="stat"><b>' + s.completed + '</b><small>Vượt thành công</small></div>' +
+    '<div class="stat"><b>' + rate + '%</b><small>Tỉ lệ</small></div></div>' +
+    '<div class="msg">Tổng tài khoản: ' + s.users + '</div>' +
+    '<table><tr><th>Nhà cung cấp</th><th>Nhấn</th><th>Thành công</th></tr>' +
+    s.by_provider.map(p => '<tr><td>' + esc(p.name) + '</td><td>' + p.clicks + '</td><td>' + p.completed + '</td></tr>').join("") + '</table></div>' +
+    '<div class="card"><h3>🔗 Link đích</h3><input id="dest" placeholder="https://link-dich-cua-ban.com" value="' + esc(s.dest_url) + '">' +
+    '<button class="w" id="sv">Lưu link đích</button>' +
+    '<div class="msg">Người dùng vượt link xong sẽ nhận key và nút mở link này. Hệ thống tự gắn link vượt cho mỗi lượt.</div></div>' +
+    '<div class="card"><h3>👑 Thêm admin</h3><input id="ae" type="email" placeholder="Email tài khoản (đã đăng ký)">' +
+    '<button class="w" id="aa">Thêm làm admin</button></div>', "admin");
+  $("sv").onclick = async () => {
+    const { error } = await sb.rpc("admin_set_dest", { p_url: $("dest").value.trim() });
+    setMsg(error ? errText(error) : "Đã lưu link đích ✓", !!error);
+  };
+  $("aa").onclick = async () => {
+    const { error } = await sb.rpc("admin_add_admin", { p_email: $("ae").value.trim() });
+    setMsg(error ? errText(error) : "Đã thêm admin ✓", !!error);
+  };
+}
+
+async function boot(){
+  const { data: { session } } = await sb.auth.getSession();
+  user = session ? session.user : null;
+  if (!user) return authView();
+  const { data } = await sb.rpc("is_admin");
+  isAdmin = !!data;
+  const done = new URLSearchParams(location.search).get("done");
+  if (done){ history.replaceState(null, "", location.pathname); return finish(done); }
+  homeView();
+}
+boot();
+</script>
+</body>
+</html>
